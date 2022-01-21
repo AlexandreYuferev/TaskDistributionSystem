@@ -1,0 +1,109 @@
+
+<!DOCTYPE HTML>
+<html lang = "rus">
+  <head> 
+    <link  href = "style.css" rel = "stylesheet">
+    <script src = "script.js"></script>
+    <script src = "server.js"></script>
+    <script>
+
+      /* ... */
+
+      let objectServerResponse; 
+      let keysOfServerResponse;
+
+      
+      window.onload = function () { 
+
+        // ==== ==== Начальный запрос на сервер ==== ==== ==== ====
+
+          // При згрузке страницы первым делом посылаем запрос на сервер.
+
+          // Ответ сервера содержит список задач (идентификатор + текст задачи) для каждой группы,
+          // необходимый для начальной достройки DOM-дерева.
+
+          /* 
+
+            code 
+
+          */
+
+        // ==== ==== Начальная достройка DOM-дерева ==== ==== ==== ====
+
+        objectServerResponse = JSON.parse(jsonServerResponse);
+        keysOfServerResponse = Object.keys(objectServerResponse);
+
+        let mainArea = document.querySelector("div.mainArea");
+
+        keysOfServerResponse.forEach((groupID) => { 
+
+          let groupOfTask = createGroupOfTask(groupID);
+          mainArea.insertAdjacentElement("beforeend", groupOfTask); 
+
+          let taskCreateButton = document.querySelector(
+            "button.taskCreateButton#" + groupID);
+
+          (Object.keys(objectServerResponse[groupID][1])).forEach((taskID) => { 
+            taskCreateButton.insertAdjacentElement("beforebegin", 
+              appendNewTask(groupID, taskID, objectServerResponse[groupID][1][taskID]));
+          });
+
+        });
+
+        // ==== ==== ... ==== ==== ==== ====
+
+        document.body.onclick = function(event) {
+
+          event  = event        || window.event;
+          target = event.target || event.srcElement;
+          keysOfServerResponse.forEach((groupID) => {
+            (Object.keys(objectServerResponse[groupID][1])).forEach((taskID) => { 
+              if (document.querySelector(".actionsList#" + groupID + "_" + taskID) != null) {
+                if (target.className != "actionMoveTo" || target.id != (groupID + "_" + taskID)) {
+                  document.querySelector(".actionsList#"       + groupID + "_" + taskID).remove();
+                  document.querySelector(".nestedActionsList#" + groupID + "_" + taskID).remove();
+                } 
+              }
+            });
+
+            /*
+            if (document.querySelector("textarea.forTextOfTask#" + groupID) != null 
+                && (target.className != "forTextOfTask" && target.id != groupID)) {
+              cancelAddingTask(groupID);
+            }
+            */            
+          });
+                
+        }
+
+      }
+
+    </script>
+  </head>
+  <body>
+
+    <!-- Навигация -->
+    <div class = "navigation">
+      <ul>
+        <li><a href="#">Home page</a></li>
+        <li><a href="#">Reference #2</a></li>
+        <li><a href="#">Reference #3</a></li>
+        <li><a href="#">Reference #4</a></li>
+      </ul>
+    </div>
+
+    <!-- Боковая панель (меню) -->
+    <div class = "sidebar">
+      <ul>
+        <li><a href="#board">Board</a></li>
+        <li><a href="#">Link #2</a></li>
+        <li><a href="#">Link #3</a></li>
+        <li><a href="#">Link #4</a></li>
+      </ul>
+    </div>
+
+    <!-- Основной контент -->
+    <div class = "mainArea"></div>
+
+  </body>
+</html>
